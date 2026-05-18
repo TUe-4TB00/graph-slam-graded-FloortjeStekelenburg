@@ -10,17 +10,24 @@ MEASUREMENT_NOISE = gtsam.noiseModel.Diagonal.Sigmas(np.array([0.05, 0.1]))  # (
 
 def add_pose(graph, initial_estimate):
 
-      # Relative motion from X(3) to X(4)
-    odometry = gtsam.Pose2(2.0,0.0, math.radians(90))
+    odometry = gtsam.Pose2(
+        math.sqrt(2),
+        math.sqrt(2),
+        math.radians(90)
+    )
 
-    # Add odometry factor
-    graph.add(gtsam.BetweenFactorPose2(X(3), X(4), odometry, ODOMETRY_NOISE))
+    graph.add(
+        gtsam.BetweenFactorPose2(
+            X(3),
+            X(4),
+            odometry,
+            ODOMETRY_NOISE
+        )
+    )
 
-    # Compute initial estimate for X(4)
     prev_pose = initial_estimate.atPose2(X(3))
     new_pose = prev_pose.compose(odometry)
 
-    # Add initial estimate
     initial_estimate.insert(X(4), new_pose)
 
 
