@@ -11,8 +11,8 @@ MEASUREMENT_NOISE = gtsam.noiseModel.Diagonal.Sigmas(np.array([0.05, 0.1]))  # (
 def add_pose(graph, initial_estimate):
 
     odometry = gtsam.Pose2(
-        2.0,
-        0.0,
+        math.sqrt(2),
+        math.sqrt(2),
         math.radians(90)
     )
 
