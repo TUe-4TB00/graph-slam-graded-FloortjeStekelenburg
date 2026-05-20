@@ -89,44 +89,44 @@ def minimize_marginals(graph, initial_estimate, pose_options):
 
 def minimize_errors(graph, initial_estimate, pose_options):
     #TODO: try different pose and landmark options here, and keep the one with the lowest resulting error.
-    best_pose = None
-    best_landmark = None
-    best_error = float("inf")
+    best_pose = 'd'
+    best_landmark = 1
 
-    list_of_errors = []
-    list_of_choices = []
+    pose_5 = pose_options[best_pose]
+    graph, initial_estimate = add_pose(graph, initial_estimate, pose_5)
+    result = optimize(graph, initial_estimate)
+    graph = add_landmark_measurement(graph, result, pose_5, best_landmark)
+    result = optimize(graph, initial_estimate)
 
-    for pose_key in pose_options.keys():
-        for landmark in [1, 2]:
+    # TODO: create a list of errors (each index corresponds to a pose) and add the error of each pose to the list
+    pose1 = result.atPose2(X(1))
+    pose2 = result.atPose2(X(2))
+    pose3 = result.atPose2(X(3))
 
-            # fresh copy per test
-            test_graph = graph.copy()
-            test_estimate = initial_estimate.copy()
+    true_pose1 = gtsam.Pose2(0.0, 0.0, 0.0)
+    true_pose2 = gtsam.Pose2(2.0, 0.0, 0.0)
+    true_pose3 = gtsam.Pose2(4.0, 0.0, 0.0)
 
-            pose_5 = pose_options[pose_key]
-            graph, initial_estimate = add_pose(graph, initial_estimate, pose_5)
-            result = optimize(graph, initial_estimate)
-            graph = add_landmark_measurement(graph, result, pose_5, best_landmark)
-            result = optimize(graph, initial_estimate)
+    error_x1 = abs(pose1.x() - true_pose1.x())
+    error_y1 = abs(pose1.y() - true_pose1.y())
+    error_theta1 = abs(pose1.theta() - true_pose1.theta())
+    error_x2 = abs(pose2.x() - true_pose2.x())
+    error_y2 = abs(pose2.y() - true_pose2.y())
+    error_theta2 = abs(pose2.theta() - true_pose2.theta())
+    error_x3 = abs(pose3.x() - true_pose3.x())
+    error_y3 = abs(pose3.y() - true_pose3.y())
+    error_theta3 = abs(pose3.theta() - true_pose3.theta())
 
-            # TODO: create a list of errors (each index corresponds to a pose) and add the error of each pose to the list
-            list_of_errors = []
-            # TODO: compute the sum of the errors and return it along with the best pose and landmark
-            list_of_errors.append(graph.error(result))
-            sum_of_errors = sum(list_of_errors)
-            error = test_graph.error(result)
 
-            list_of_errors.append(error)
-            list_of_choices.append((pose_key, landmark))
-
-            if error < best_error:
-                best_error = error
-                best_pose = pose_key
-                best_landmark = landmark
+    list_of_errors = [
+    error_x1, error_y1, error_theta1,
+    error_x2, error_y2, error_theta2,
+    error_x3, error_y3, error_theta3]
+    # TODO: compute the sum of the errors and return it along with the best pose and landmark
 
     sum_of_errors = sum(list_of_errors)
 
-    print(f"Sum of errors: {sum_of_errors}")
-
+    print(f"sum of errors: {sum_of_errors}")
+    
     
     return best_pose, best_landmark, sum_of_errors 
